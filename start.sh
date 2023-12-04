@@ -18,3 +18,9 @@ curl -s -o /dev/null -k -u "redis@redis.com:redis" https://localhost:9443/v1/bdb
 
 echo "*** Build RE DB ***"
 curl -s -o /dev/null -k -u "redis@redis.com:redis" https://localhost:9443/v1/bdbs -H "Content-Type:application/json" -d @re-db.json
+
+echo "*** Deploy Functions ***"
+npm run deploy
+
+echo "*** Run Test App ***"
+npm run app
