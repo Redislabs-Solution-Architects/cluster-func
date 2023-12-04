@@ -1,0 +1,22 @@
+{
+  "name": "cluster-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./src/app.js",  
+  "scripts": {
+    "app": "node ./src/app.js",
+    "deploy-redb": "gears-api ./src/cluster_test.js -r redis://default:redis@localhost:12000",
+    "deploy-ossdb": "gears-api ./src/cluster_test.js -r redis://default:redis@localhost:13000",
+    "deploy": "npm run deploy-redb && npm run deploy-ossdb"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "See LICENSE",
+  "dependencies": {
+    "redis": "^4.6.11"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@redis/gears-api": "https://gitpkg.now.sh/RedisGears/RedisGears/js_api"
+  }
+}
