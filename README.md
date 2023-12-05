@@ -1,4 +1,4 @@
-# Redis Triggers and functions write operations with OSS Cluster API
+# Redis Triggers and functions write operations with RE and RE w/OSS Cluster API
 
 ## Contents
 1.  [Summary](#summary)
@@ -11,7 +11,7 @@
 8.  [Results](#results)
 
 ## Summary <a name="summary"></a>
-This is code demonstrates a workaround for the Trigger and function challenge with remote writes.  Using a Redis DB configured with OSS Cluster API support, writes can be directed to a local shard via the cluster client.  
+This is code demonstrates a workaround for the Trigger and function challenge with remote writes in two different modes:  RE cluster, RE w/OSS Cluster API.  
 
 ## Architecture <a name="architecture"></a>
 - Two databases each with 3 shards are created.  
@@ -60,46 +60,37 @@ git clone https://github.com/Redislabs-Solution-Architects/cluster-func.git && c
 ```
 
 ## Results <a name="results"></a>
-### app.js Output
-All SETS appear to have executed successfully, but that is not true for the RE tests.  Only 1 of those SETS actually resulted in data being written to Redis.  
 ```bash
+
 *** RE Write Tests ***
-*** SET abc:1***
+*** SET abc:1 ***
 response: OK
-*** SET key:1***
+*** SET key:1 ***
 response: OK
-*** SET {xyz:}1***
+*** SET {xyz:}1 ***
 response: OK
 
-*** OSS Write Tests ***
-*** SET abc:1***
+*** RE Read Tests ***
+*** GET abc:1 ***
+response: val:1
+*** GET key:1 ***
+response: val:2
+*** GET {xyz:}1 ***
+response: val:3
+
+*** OSS Cluster API Write Tests ***
+*** SET abc:1 ***
 response: OK
-*** SET key:1***
+*** SET key:1 ***
 response: OK
-*** SET {xyz:}1***
+*** SET {xyz:}1 ***
 response: OK
-```
-### RE DB State
-The app client was connected to RE shard 1 as such, the only write that was actually successful was for the key local to that shard - abc:1
-```bash
-./redis-cli --no-auth-warning -u redis://default:redis@localhost:12000 GET abc:1 
-"foo"
 
-./redis-cli --no-auth-warning -u redis://default:redis@localhost:12000 GET key:1 
-(nil)
-
-./redis-cli --no-auth-warning -u redis://default:redis@localhost:12000 GET {xyz:}1 
-(nil)
-```
-### OSS DB State
-All OSS-based SETs from the Redis function were successful.  The function call was wrapped in a OSS cluster API to ensure the write was performed on the shard for key's hashslot.
-```bash
-./redis-cli --no-auth-warning -u redis://default:redis@localhost:13000 -c GET abc:1 
-"foo"
-
-./redis-cli --no-auth-warning -u redis://default:redis@localhost:13000 -c GET key:1 
-"foo"
-
-./redis-cli --no-auth-warning -u redis://default:redis@localhost:13000 -c GET {xyz:}1 
-"foo"
+*** OSS Cluster API Read Tests ***
+*** GET abc:1 ***
+response: val:1
+*** GET key:1 ***
+response: val:2
+*** GET {xyz:}1 ***
+response: val:3
 ```
